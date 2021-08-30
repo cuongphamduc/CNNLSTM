@@ -1,0 +1,4 @@
+opencv
+pytorch
+torchvision
+pillow
