@@ -48,7 +48,8 @@ while True:
         tensor_frames = tensor_frames.to(device)
         tensor_frames = torch.unsqueeze(tensor_frames, 0)
 
-        pred = model(tensor_frames)
+        with torch.no_grad():
+            pred = model(tensor_frames)
         pred_idx = torch.argmax(pred, dim=1)[0]
 
         if pred_idx:
