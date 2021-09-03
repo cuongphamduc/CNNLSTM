@@ -25,6 +25,8 @@ model.train()
 
 num_epochs = 100
 
+best_val_acc = 0
+
 for epoch in range(num_epochs):
     if epoch % 5 == 0:
         loop = tqdm(train_loader, total=len(train_loader) + len(valid_loader), position=0, leave=False)
@@ -44,13 +46,11 @@ for epoch in range(num_epochs):
         loss.backward()
         optimizer.step()
 
-        loop.set_postfix(loss=loss.item())
+        loop.set_postfix(train_loss=loss.item())
         loop.update(1)
         sleep(0.1)
 
     if epoch % 5 == 0:
-        torch.save(model.state_dict(), "save/model_epoch_" + str(epoch + 1) + ".pth")
-
         num_correct = 0
         num_samples = 0
         model.eval()
@@ -67,7 +67,13 @@ for epoch in range(num_epochs):
                 num_correct += (pred_idx == y).sum().item()
                 num_samples += y.size(0)
 
-                loop.set_postfix(accuracy=round(num_correct / num_samples, 3))
+                val_acc = round(num_correct / num_samples, 3)
+
+                if val_acc > best_val_acc:
+                    best_val_acc = val_acc
+                    torch.save(model.state_dict(), "save/model_best.pth")
+
+                loop.set_postfix(val_accuracy=val_acc)
                 loop.update(1)
                 sleep(0.1)
 
